@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 const redis = require('ioredis');
-const Minio = require('minio')
-require('dotenv').config()
+const Minio = require('minio');
+require('dotenv').config();
 
 const config = require('./config/config.json')[
   process.env.NODE_ENV || 'development'
@@ -34,11 +34,11 @@ const minioClient = new Minio.Client({
   endPoint: 'localhost',
   port: 9000,
   useSSL: false,
-  accessKey: '8ecEMwDtjccEI43eLTZB',
+  accessKey: 'zqTFRvyK0Gp44mXTJUxv',
   secretKey: process.env.MINIO_SECRET_KEY,
-})
+});
 
-const bucket = 'semp'
+const bucket = 'semp';
 
 const setupMinio = async () => {
   const exists = await minioClient.bucketExists(bucket);
@@ -50,11 +50,11 @@ const setupMinio = async () => {
   }
 };
 
-setupMinio()
+setupMinio();
 
 module.exports = {
   dbConf,
   redisConf,
   handleRedisOperation,
-  minioClient
+  minioClient,
 };

@@ -16,10 +16,6 @@ class ChatsDAO {
     } else if (id) {
       return chats.some((chat: Chat) => chat.id === id);
     }
-
-    // if (isChatExist) {
-    //   throw new CustomError(`chat with name="${title}" already exists`, 400);
-    // }
   }
 
   static async getChats() {
@@ -31,14 +27,14 @@ class ChatsDAO {
     }
   }
 
-  static async postChat(title: string, description: string) {
+  static async postChat(title: string, description: string, image: any) {
     try {
       this._ifOneFromFieldsEmpty(title, description);
       const isChatExist = await this._isChatExist(undefined, title);
       if (isChatExist) {
         throw new CustomError(`chat with name="${title}" already exists`, 400);
       }
-      await ChatsRepository.postChat(title, description);
+      await ChatsRepository.postChat(title, description, image);
     } catch (e) {
       throw e;
     }

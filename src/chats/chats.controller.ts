@@ -14,9 +14,10 @@ class ChatsController {
 
   async postChat(req: Request, res: Response): Promise<void> {
     const { title, description } = req.body;
+    const image = req.file;
 
     try {
-      await ChatsDAO.postChat(title, description);
+      await ChatsDAO.postChat(title, description, image);
       res.sendStatus(200);
     } catch (error) {
       ErrorHandler.handle(res, error);

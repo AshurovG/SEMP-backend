@@ -16,6 +16,9 @@ module.exports = () => {
     description: {
       type: DataTypes.STRING,
     },
+    image: {
+      type: DataTypes.STRING,
+    },
   });
 
   return Chat;

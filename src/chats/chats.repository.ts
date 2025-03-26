@@ -1,3 +1,4 @@
+const { minioClient } = require('../../db');
 const Chat = require('../../models/chat');
 
 class ChatsRepository {
@@ -10,11 +11,22 @@ class ChatsRepository {
     }
   }
 
-  static async postChat(title: string, description: string) {
+  static async postChat(title: string, description: string, image: any) {
     try {
+      if (image) {
+        await minioClient.putObject(
+          'semp',
+          `chats/${image.originalname}`,
+          image.buffer
+        );
+      }
+
       const newChat = await Chat().build({
         title,
         description,
+        ...(image && {
+          image: `http://localhost:9000/semp/posts/${image.originalname}`,
+        }),
       });
 
       await newChat.save();
