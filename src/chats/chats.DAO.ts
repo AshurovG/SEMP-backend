@@ -80,6 +80,20 @@ class ChatsDAO {
     }
   }
 
+  static async getUsersNotFromChat(id: number) {
+    try {
+      const isChatExist = await this._isChatExist(id);
+      if (!isChatExist) {
+        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      }
+
+      const users = await ChatsRepository.getUsersNotFromChat(id);
+      return users;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   static async addUsersToChat(id: number, users: number[]) {
     try {
       const isChatExist = await this._isChatExist(id);
@@ -92,6 +106,7 @@ class ChatsDAO {
       throw e;
     }
   }
+
   static async deleteUsersFromChat(id: number, users: number[]) {
     try {
       const isChatExist = await this._isChatExist(id);

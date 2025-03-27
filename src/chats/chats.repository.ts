@@ -2,7 +2,7 @@ const { minioClient } = require('../../db');
 const Chat = require('../../models/chat');
 const User = require('../../models/user');
 const UserChat = require('../../models/userChat');
-const ChatData = require('./types');
+const { Op } = require('sequelize');
 
 class ChatsRepository {
   static async getChats() {
@@ -19,7 +19,6 @@ class ChatsRepository {
     try {
       const allUsers = await User().findAll();
 
-      // Преобразуем список всех пользователей в объект для быстрого доступа по ID
       const usersMap = allUsers.reduce((map: any, user: any) => {
         map[user.id] = {
           id: user.id,
@@ -86,6 +85,28 @@ class ChatsRepository {
   static async deleteChat(id: number) {
     try {
       await Chat().destroy({ where: { id } });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async getUsersNotFromChat(id: number) {
+    try {
+      const allUsers = await User().findAll();
+
+      const userChats = await UserChat().findAll({
+        where: { chatID: id },
+      });
+
+      const userChatIds = new Set(
+        userChats.map((userChat: any) => userChat.userID)
+      );
+
+      const usersNotInChat = allUsers.filter(
+        (user: any) => !userChatIds.has(user.id)
+      );
+
+      return usersNotInChat;
     } catch (e) {
       throw e;
     }

@@ -58,6 +58,17 @@ class ChatsController {
     }
   }
 
+  async getUsersNotFromChat(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    try {
+      const data = await ChatsDAO.getUsersNotFromChat(Number(id));
+      res.json(data);
+    } catch (error) {
+      ErrorHandler.handle(res, error);
+    }
+  }
+
   async addUsersToChat(req: Request, res: Response): Promise<void> {
     const { users } = req.body;
     const { id } = req.params;
