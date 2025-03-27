@@ -2,7 +2,8 @@ const { minioClient } = require('../../db');
 const Chat = require('../../models/chat');
 const User = require('../../models/user');
 const UserChat = require('../../models/userChat');
-const { Op } = require('sequelize');
+const Message = require('../../models/message');
+const MessageData = require('./types');
 
 class ChatsRepository {
   static async getChats() {
@@ -33,13 +34,26 @@ class ChatsRepository {
         where: { chatID: id },
       });
 
+      const messages = await Message().findAll({
+        where: { chatID: id },
+      });
+
       const users = userChats.map((userChat: any) => usersMap[userChat.userID]);
 
       const chat = await Chat().findByPk(id);
 
+      const messagesWithSenders = messages.map((message: any) => ({
+        id: message.id,
+        text: message.text,
+        image: message.image,
+        sendingTime: message.sendingTime,
+        sender: usersMap[message.senderID],
+      }));
+
       return {
         ...chat.toJSON(),
         users,
+        messages: messagesWithSenders,
       };
     } catch (e) {
       throw e;
