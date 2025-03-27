@@ -6,6 +6,7 @@ import multer from 'multer';
 const upload = multer();
 
 router.get('/chats', chatsController.getChats);
+router.get('/chats/:id', chatsController.getChatById);
 router.post('/chats', upload.single('image'), chatsController.postChat);
 router.put('/chats/:id', chatsController.updateChat); // TODO: Сделать частичное изменение полей
 router.delete('/chats/:id', chatsController.deleteChat);

@@ -12,6 +12,17 @@ class ChatsController {
     }
   }
 
+  async getChatById(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    try {
+      const data = await ChatsDAO.getChatById(Number(id));
+      res.json(data);
+    } catch (error) {
+      ErrorHandler.handle(res, error);
+    }
+  }
+
   async postChat(req: Request, res: Response): Promise<void> {
     const { title, description } = req.body;
     const image = req.file;

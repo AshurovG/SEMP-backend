@@ -1,6 +1,6 @@
 const { ChatsRepository } = require('./chats.repository');
 const { CustomError } = require('../consts');
-import { Chat } from './types';
+import { ChatData } from './types';
 
 class ChatsDAO {
   static _ifOneFromFieldsEmpty(title: string, description: string) {
@@ -12,9 +12,9 @@ class ChatsDAO {
   static async _isChatExist(id?: number, title?: string) {
     const chats = await this.getChats();
     if (title) {
-      return chats.some((chat: Chat) => chat.title.trim() === title);
+      return chats.some((chat: ChatData) => chat.title.trim() === title);
     } else if (id) {
-      return chats.some((chat: Chat) => chat.id === id);
+      return chats.some((chat: ChatData) => chat.id === id);
     }
   }
 
@@ -22,6 +22,20 @@ class ChatsDAO {
     try {
       const chats = await ChatsRepository.getChats();
       return chats;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async getChatById(id: number) {
+    try {
+      const isChatExist = await this._isChatExist(id);
+      if (!isChatExist) {
+        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      }
+
+      const chat = await ChatsRepository.getChatById(id);
+      return chat;
     } catch (e) {
       throw e;
     }

@@ -1,11 +1,47 @@
 const { minioClient } = require('../../db');
 const Chat = require('../../models/chat');
+const User = require('../../models/user');
+const UserChat = require('../../models/userChat');
+const ChatData = require('./types');
 
 class ChatsRepository {
   static async getChats() {
     try {
       const chats = await Chat().findAll();
       return chats;
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  static async getChatById(id: number) {
+    try {
+      const allUsers = await User().findAll();
+
+      // Преобразуем список всех пользователей в объект для быстрого доступа по ID
+      const usersMap = allUsers.reduce((map: any, user: any) => {
+        map[user.id] = {
+          id: user.id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          avatar: user.avatar,
+        };
+        return map;
+      }, {});
+
+      const userChats = await UserChat().findAll({
+        where: { chatID: id },
+      });
+
+      const users = userChats.map((userChat: any) => usersMap[userChat.userID]);
+
+      const chat = await Chat().findByPk(id);
+
+      return {
+        ...chat.toJSON(),
+        users,
+      };
     } catch (e) {
       throw e;
     }
