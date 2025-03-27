@@ -90,6 +90,33 @@ class ChatsRepository {
       throw e;
     }
   }
+
+  static async addUsersToChat(id: number, users: number[]) {
+    try {
+      const userChatEntries = users.map((userID) => ({
+        userID: userID,
+        chatID: id,
+      }));
+
+      await UserChat().bulkCreate(userChatEntries);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async deleteUsersFromChat(id: number, users: number[]) {
+    await UserChat().destroy({
+      where: {
+        chatID: id,
+        userID: users,
+      },
+    });
+    try {
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
 }
 
 module.exports = {

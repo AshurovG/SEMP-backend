@@ -57,6 +57,30 @@ class ChatsController {
       ErrorHandler.handle(res, error);
     }
   }
+
+  async addUsersToChat(req: Request, res: Response): Promise<void> {
+    const { users } = req.body;
+    const { id } = req.params;
+
+    try {
+      await ChatsDAO.addUsersToChat(Number(id), users);
+      res.sendStatus(200);
+    } catch (error) {
+      ErrorHandler.handle(res, error);
+    }
+  }
+
+  async deleteUsersFromChat(req: Request, res: Response): Promise<void> {
+    const { users } = req.body;
+    const { id } = req.params;
+
+    try {
+      await ChatsDAO.deleteUsersFromChat(Number(id), users);
+      res.sendStatus(200);
+    } catch (error) {
+      ErrorHandler.handle(res, error);
+    }
+  }
 }
 
 module.exports = new ChatsController();

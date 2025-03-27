@@ -79,6 +79,31 @@ class ChatsDAO {
       throw e;
     }
   }
+
+  static async addUsersToChat(id: number, users: number[]) {
+    try {
+      const isChatExist = await this._isChatExist(id);
+      if (!isChatExist) {
+        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      }
+
+      await ChatsRepository.addUsersToChat(id, users);
+    } catch (e) {
+      throw e;
+    }
+  }
+  static async deleteUsersFromChat(id: number, users: number[]) {
+    try {
+      const isChatExist = await this._isChatExist(id);
+      if (!isChatExist) {
+        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      }
+
+      await ChatsRepository.deleteUsersFromChat(id, users);
+    } catch (e) {
+      throw e;
+    }
+  }
 }
 
 module.exports = {
