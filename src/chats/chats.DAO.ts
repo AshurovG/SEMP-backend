@@ -1,6 +1,7 @@
 const { ChatsRepository } = require('./chats.repository');
 const { CustomError } = require('../consts');
 import { ChatData } from './types';
+const { AuthDAO } = require('../auth/auth.DAO');
 
 class ChatsDAO {
   static _ifOneFromFieldsEmpty(title: string, description: string) {
@@ -18,9 +19,10 @@ class ChatsDAO {
     }
   }
 
-  static async getChats() {
+  static async getChats(sessionID?: string) {
     try {
-      const chats = await ChatsRepository.getChats();
+      const user = await AuthDAO.getUserBySession(sessionID);
+      const chats = await ChatsRepository.getChats(user);
       return chats;
     } catch (e) {
       throw e;
@@ -28,11 +30,12 @@ class ChatsDAO {
   }
 
   static async getChatById(id: number) {
+    // TODO: исправить обработку ошибки
     try {
-      const isChatExist = await this._isChatExist(id);
-      if (!isChatExist) {
-        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
-      }
+      // const isChatExist = await this._isChatExist(id);
+      // if (!isChatExist) {
+      //   throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      // }
 
       const chat = await ChatsRepository.getChatById(id);
       return chat;
@@ -44,10 +47,10 @@ class ChatsDAO {
   static async postChat(title: string, description: string, image: any) {
     try {
       this._ifOneFromFieldsEmpty(title, description);
-      const isChatExist = await this._isChatExist(undefined, title);
-      if (isChatExist) {
-        throw new CustomError(`chat with name="${title}" already exists`, 400);
-      }
+      // const isChatExist = await this._isChatExist(undefined, title);
+      // if (isChatExist) {
+      //   throw new CustomError(`chat with name="${title}" already exists`, 400);
+      // }
       await ChatsRepository.postChat(title, description, image);
     } catch (e) {
       throw e;
@@ -61,10 +64,10 @@ class ChatsDAO {
     image: any
   ) {
     try {
-      const isChatExist = await this._isChatExist(id);
-      if (!isChatExist) {
-        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
-      }
+      // const isChatExist = await this._isChatExist(id);
+      // if (!isChatExist) {
+      //   throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      // }
 
       await ChatsRepository.updateChat(id, title, description, image);
     } catch (e) {
@@ -74,10 +77,10 @@ class ChatsDAO {
 
   static async deleteChat(id: number) {
     try {
-      const isChatExist = await this._isChatExist(id);
-      if (!isChatExist) {
-        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
-      }
+      // const isChatExist = await this._isChatExist(id);
+      // if (!isChatExist) {
+      //   throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      // }
 
       await ChatsRepository.deleteChat(id);
     } catch (e) {
@@ -87,10 +90,10 @@ class ChatsDAO {
 
   static async getUsersNotFromChat(id: number) {
     try {
-      const isChatExist = await this._isChatExist(id);
-      if (!isChatExist) {
-        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
-      }
+      // const isChatExist = await this._isChatExist(id);
+      // if (!isChatExist) {
+      //   throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      // }
 
       const users = await ChatsRepository.getUsersNotFromChat(id);
       return users;
@@ -101,10 +104,10 @@ class ChatsDAO {
 
   static async addUsersToChat(id: number, users: number[]) {
     try {
-      const isChatExist = await this._isChatExist(id);
-      if (!isChatExist) {
-        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
-      }
+      // const isChatExist = await this._isChatExist(id);
+      // if (!isChatExist) {
+      //   throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      // }
 
       await ChatsRepository.addUsersToChat(id, users);
     } catch (e) {
@@ -114,10 +117,10 @@ class ChatsDAO {
 
   static async deleteUsersFromChat(id: number, users: number[]) {
     try {
-      const isChatExist = await this._isChatExist(id);
-      if (!isChatExist) {
-        throw new CustomError(`chat with id=${id} doesn't exist`, 404);
-      }
+      // const isChatExist = await this._isChatExist(id);
+      // if (!isChatExist) {
+      //   throw new CustomError(`chat with id=${id} doesn't exist`, 404);
+      // }
 
       await ChatsRepository.deleteUsersFromChat(id, users);
     } catch (e) {

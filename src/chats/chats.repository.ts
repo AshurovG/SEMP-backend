@@ -6,10 +6,27 @@ const Message = require('../../models/message');
 const MessageData = require('./types');
 
 class ChatsRepository {
-  static async getChats() {
+  static async getChats(user: any) {
     try {
-      const chats = await Chat().findAll();
-      return chats;
+      if (user.isAdmin) {
+        const chats = await Chat().findAll();
+        console.log('if', user);
+        return chats;
+      } else {
+        const userChats = await UserChat().findAll({
+          where: { userID: user.id },
+        });
+
+        const chatIds = userChats.map((uc: any) => uc.chatID);
+
+        const chats = await Chat().findAll({
+          where: {
+            id: chatIds,
+          },
+        });
+
+        return chats;
+      }
     } catch (e) {
       console.log(e);
       throw e;
@@ -18,6 +35,8 @@ class ChatsRepository {
 
   static async getChatById(id: number) {
     try {
+      console.log('getChatById reo');
+
       const allUsers = await User().findAll();
 
       const usersMap = allUsers.reduce((map: any, user: any) => {
@@ -56,6 +75,7 @@ class ChatsRepository {
         messages: messagesWithSenders,
       };
     } catch (e) {
+      console.log(e);
       throw e;
     }
   }

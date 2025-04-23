@@ -3,9 +3,11 @@ const { ErrorHandler } = require('../consts');
 import { Response, Request } from 'express';
 
 class ChatsController {
-  async getChats(_: Request, res: Response): Promise<void> {
+  async getChats(req: Request, res: Response): Promise<void> {
+    const { sessionID } = req.cookies;
+
     try {
-      const data = await ChatsDAO.getChats();
+      const data = await ChatsDAO.getChats(sessionID);
       res.json(data);
     } catch (e) {
       ErrorHandler.handle(res, e);
