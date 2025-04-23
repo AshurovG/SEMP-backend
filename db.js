@@ -34,7 +34,7 @@ const minioClient = new Minio.Client({
   endPoint: 'localhost',
   port: 9000,
   useSSL: false,
-  accessKey: 'zqTFRvyK0Gp44mXTJUxv',
+  accessKey: 'AFecI0g7kPHen3pSTKp6',
   secretKey: process.env.MINIO_SECRET_KEY,
 });
 

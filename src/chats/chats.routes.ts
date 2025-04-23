@@ -8,7 +8,7 @@ const upload = multer();
 router.get('/chats', chatsController.getChats);
 router.get('/chats/:id', chatsController.getChatById);
 router.post('/chats', upload.single('image'), chatsController.postChat);
-router.put('/chats/:id', chatsController.updateChat); // TODO: Сделать частичное изменение полей
+router.put('/chats/:id', upload.single('image'), chatsController.updateChat); // TODO: Сделать частичное изменение полей
 router.delete('/chats/:id', chatsController.deleteChat);
 router.get('/chats/members/not/:id', chatsController.getUsersNotFromChat);
 router.post('/chats/members/:id', chatsController.addUsersToChat);

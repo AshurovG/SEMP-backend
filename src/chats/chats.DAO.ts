@@ -54,14 +54,19 @@ class ChatsDAO {
     }
   }
 
-  static async updateChat(id: number, title: string, description: string) {
+  static async updateChat(
+    id: number,
+    title: string,
+    description: string,
+    image: any
+  ) {
     try {
       const isChatExist = await this._isChatExist(id);
       if (!isChatExist) {
         throw new CustomError(`chat with id=${id} doesn't exist`, 404);
       }
 
-      await ChatsRepository.updateChat(id, title, description);
+      await ChatsRepository.updateChat(id, title, description, image);
     } catch (e) {
       throw e;
     }

@@ -84,17 +84,66 @@ class ChatsRepository {
     }
   }
 
-  static async updateChat(id: number, title: string, description: string) {
+  static async updateChat(
+    id: number,
+    title: string,
+    description: string,
+    image: any
+  ) {
     try {
       const chatToUpdate = await Chat().findByPk(id);
+
+      console.log('req', id, title, description, image);
+      if (!chatToUpdate) {
+        throw new Error('Chat not found');
+      }
+
+      if (image) {
+        if (chatToUpdate.image) {
+          const oldImagePath = chatToUpdate.image.replace(
+            'http://localhost:9000/semp/',
+            ''
+          );
+          await minioClient.removeObject('semp', oldImagePath);
+        }
+
+        await minioClient.putObject(
+          'semp',
+          `chats/${image.originalname}`,
+          image.buffer
+        );
+
+        chatToUpdate.image = `http://localhost:9000/semp/chats/${image.originalname}`;
+      }
+
       chatToUpdate.title = title;
       chatToUpdate.description = description;
 
       await chatToUpdate.save();
+      return chatToUpdate;
     } catch (e) {
+      console.log('req', id, title, description, image);
+      console.log(e);
       throw e;
     }
   }
+
+  // static async updateChat(
+  //   id: number,
+  //   title: string,
+  //   description: string,
+  //   image: any
+  // ) {
+  //   try {
+  //     const chatToUpdate = await Chat().findByPk(id);
+  //     chatToUpdate.title = title;
+  //     chatToUpdate.description = description;
+
+  //     await chatToUpdate.save();
+  //   } catch (e) {
+  //     throw e;
+  //   }
+  // }
 
   static async deleteChat(id: number) {
     try {

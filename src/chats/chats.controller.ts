@@ -37,10 +37,11 @@ class ChatsController {
 
   async updateChat(req: Request, res: Response): Promise<void> {
     const { title, description } = req.body;
+    const image = req.file;
     const { id } = req.params;
 
     try {
-      await ChatsDAO.updateChat(Number(id), title, description);
+      await ChatsDAO.updateChat(Number(id), title, description, image);
       res.sendStatus(200);
     } catch (error) {
       ErrorHandler.handle(res, error);
