@@ -1,9 +1,8 @@
-// websocket.ts
 const { WebSocketServer } = require('ws');
 import http from 'http';
 const { UsersDAO } = require('./users/users.DAO');
-const { ChatsDAO } = require('./chats/chats.DAO');
 const { ChatsRepository } = require('./chats/chats.repository');
+const { MessagesRepository } = require('./messages/messages.repository');
 
 type Connection = {
   id: number;
@@ -20,11 +19,28 @@ export const setupWebSocket = (server: http.Server) => {
 
   const wss = new WebSocketServer({ server });
 
-  const sendMessageToOtherUsers = (message: any) => {
+  const sendMessageToOtherUsers = (message: any, createdMessage: any) => {
+    console.log('created', createdMessage);
+    const responseMessageData = {
+      id: createdMessage.id,
+      text: createdMessage.text,
+      image: createdMessage.image,
+      sendingTime: createdMessage.sendingTime,
+      sender: {
+        id: message.user.id,
+        firstname: message.user.firstname,
+        lastname: message.user.lastname,
+        avatar: message.user.avatar,
+      },
+    };
+
     for (const [key, value] of Object.entries(connections)) {
       console.log('key', key, message.user.id);
+
       if (Number(key) !== Number(message.user.id)) {
-        value.ws.send(JSON.stringify(message)); // Отправляем все пользователям кроме отправителя
+        if (value.chatIds.includes(message.chatID))
+          console.log(responseMessageData);
+        value.ws.send(JSON.stringify(responseMessageData)); // Отправляем все пользователям кроме отправителя
       }
     }
   };
@@ -34,7 +50,6 @@ export const setupWebSocket = (server: http.Server) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const userID = url.searchParams.get('id');
     const userData = await UsersDAO.getUser(userID);
-    // const userChats = await ChatsDAO.getChats(userData);
     const userChats = await ChatsRepository.getChats(userData);
     const chatIds = userChats.map((chat: any) => chat.id);
     console.log('connected', userID);
@@ -52,16 +67,21 @@ export const setupWebSocket = (server: http.Server) => {
       ws.close();
     }
 
-    ws.on('message', (message: any) => {
+    ws.on('message', async (message: any) => {
       try {
         // Получение сообщения от отправителя с браузера
         const messageString = message.toString();
         const messageJSON = JSON.parse(messageString);
         console.log('message json', messageJSON);
         const currentDateISO = new Date().toISOString();
-        messageJSON.time = currentDateISO;
-        // TODO: Здесь сохранять в базу
-        sendMessageToOtherUsers(messageJSON);
+        const createdMessage = await MessagesRepository.postMessage({
+          senderID: messageJSON.user.id,
+          chatID: messageJSON.chatID,
+          text: messageJSON.message.text,
+          sendingTime: currentDateISO,
+        });
+
+        sendMessageToOtherUsers(messageJSON, createdMessage);
       } catch (error) {
         console.error('Error parsing JSON:', error);
       }
@@ -75,26 +95,6 @@ export const setupWebSocket = (server: http.Server) => {
       }
     });
   });
-
-  //   wss.on('connection', (ws: any) => {
-  //     console.log('Новое WebSocket соединение');
-
-  //     ws.on('message', (message: any) => {
-  //       console.log(`Получено сообщение: ${message}`);
-  //       // Рассылка сообщения всем клиентам
-  //       if (wss.clients) {
-  //         wss.clients.forEach((client: any) => {
-  //           if (client !== ws && client.readyState === WebSocketServer.OPEN) {
-  //             client.send(message.toString());
-  //           }
-  //         });
-  //       }
-  //     });
-
-  //     ws.on('close', () => {
-  //       console.log('Соединение закрыто');
-  //     });
-  //   });
 
   return wss;
 };
