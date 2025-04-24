@@ -19,11 +19,16 @@ class ChatsDAO {
     }
   }
 
-  static async getChats(sessionID?: string) {
+  static async getChats(sessionID?: string, user?: any) {
     try {
-      const user = await AuthDAO.getUserBySession(sessionID);
-      const chats = await ChatsRepository.getChats(user);
-      return chats;
+      if (user) {
+        const chats = await ChatsRepository.getChats(user);
+        return chats;
+      } else {
+        const user = await AuthDAO.getUserBySession(sessionID);
+        const chats = await ChatsRepository.getChats(user);
+        return chats;
+      }
     } catch (e) {
       throw e;
     }
