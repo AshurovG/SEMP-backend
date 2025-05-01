@@ -23,24 +23,32 @@ export const setupWebSocket = (server: http.Server) => {
     console.log('created', createdMessage);
     const responseMessageData = {
       id: createdMessage.id,
+      chatID: message.chatID,
       text: createdMessage.text,
       image: createdMessage.image,
       sendingTime: createdMessage.sendingTime,
       sender: {
-        id: message.user.id,
-        firstname: message.user.firstname,
-        lastname: message.user.lastname,
-        avatar: message.user.avatar,
+        id: message.sender.id,
+        firstname: message.sender.firstname,
+        lastname: message.sender.lastname,
+        avatar: message.sender.avatar,
       },
     };
 
     for (const [key, value] of Object.entries(connections)) {
-      console.log('key', key, message.user.id);
+      console.log('key', key, message.sender.id);
+      console.log(
+        'value.chatIds',
+        value.chatIds,
+        'id',
+        message.chatID,
+        value.chatIds.includes(message.chatID)
+      );
 
-      if (Number(key) !== Number(message.user.id)) {
-        if (value.chatIds.includes(message.chatID))
-          console.log(responseMessageData);
-        value.ws.send(JSON.stringify(responseMessageData)); // Отправляем все пользователям кроме отправителя
+      if (Number(key) !== Number(message.sender.id)) {
+        if (value.chatIds.includes(message.chatID)) {
+          value.ws.send(JSON.stringify(responseMessageData)); // Отправляем все пользователям кроме отправителя
+        }
       }
     }
   };
@@ -56,10 +64,10 @@ export const setupWebSocket = (server: http.Server) => {
 
     if (userID) {
       // Проверяем, есть ли уже подключение для данного пользователя
-      if (connections[userID]) {
-        // Если подключение уже существует, закрываем его
-        connections[userID].ws.close();
-      }
+      // if (connections[userID]) {
+      //   // Если подключение уже существует, закрываем его
+      //   connections[userID].ws.close();
+      // }
       // Добавляем новое подключение
       connections[userID] = { id: Date.now(), ws: ws, chatIds };
       console.log(connections);
@@ -75,7 +83,7 @@ export const setupWebSocket = (server: http.Server) => {
         console.log('message json', messageJSON);
         const currentDateISO = new Date().toISOString();
         const createdMessage = await MessagesRepository.postMessage({
-          senderID: messageJSON.user.id,
+          senderID: messageJSON.sender.id,
           chatID: messageJSON.chatID,
           text: messageJSON.message.text,
           sendingTime: currentDateISO,

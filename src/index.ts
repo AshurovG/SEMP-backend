@@ -82,10 +82,22 @@ const server = http.createServer(app);
 // Настраиваем WebSocket
 setupWebSocket(server);
 
+// app.use(
+//   cors({
+//     origin: 'http://localhost:5173',
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: [
+      'http://localhost:5173',
+      'ws://localhost:5173', // для WebSocket
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 app.use(bodyParser.json());

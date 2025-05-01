@@ -25,7 +25,88 @@ class ChatsRepository {
           },
         });
 
-        return chats;
+        // chats.map(async (chat: any) => {
+        //   const messages = await Message().findAll({
+        //     where: { chatID: chat.id },
+        //   });
+
+        //   const latestMessage =
+        //     messages.length > 0
+        //       ? messages.reduce(
+        //           (latest: any, current: any) =>
+        //             new Date(current.sendingTime) > new Date(latest.sendingTime)
+        //               ? current
+        //               : latest,
+        //           messages[0] // начальное значение (первый элемент)
+        //         )
+        //       : null; // если массив пуст
+
+        //   const sender = await User().findOne({
+        //     where: { id: latestMessage.senderID },
+        //   });
+
+        //   const latestMessageToSend = {
+        //     id: latestMessage.id,
+        //     text: latestMessage.text,
+        //     image: latestMessage.image,
+        //     sendingTime: latestMessage.sendingTime,
+        //     sender: {
+        //       firstname: sender.firstname,
+        //       lastname: sender.lastname,
+        //     },
+        //   };
+
+        //   console.log({ ...chat.toJSON(), latestMessage: latestMessageToSend });
+        //   return { ...chat.toJSON(), latestMessage: latestMessageToSend };
+
+        //   // if (latestMessageToSend)
+        //   //   console.log('latestMessage', latestMessageToSend);
+        // });
+
+        const chatsWithLatestMessages = await Promise.all(
+          chats.map(async (chat: any) => {
+            const messages = await Message().findAll({
+              where: { chatID: chat.id },
+            });
+
+            const latestMessage =
+              messages.length > 0
+                ? messages.reduce(
+                    (latest: any, current: any) =>
+                      new Date(current.sendingTime) >
+                      new Date(latest.sendingTime)
+                        ? current
+                        : latest,
+                    messages[0]
+                  )
+                : null;
+
+            if (!latestMessage) {
+              return { ...chat.toJSON(), latestMessage: null };
+            }
+
+            const sender = await User().findOne({
+              where: { id: latestMessage.senderID },
+            });
+
+            const latestMessageToSend = {
+              id: latestMessage.id,
+              text: latestMessage.text,
+              image: latestMessage.image,
+              sendingTime: latestMessage.sendingTime,
+              sender: {
+                firstname: sender?.firstname,
+                lastname: sender?.lastname,
+              },
+            };
+
+            return { ...chat.toJSON(), latestMessage: latestMessageToSend };
+          })
+        );
+
+        console.log('returned chats', chatsWithLatestMessages);
+
+        return chatsWithLatestMessages;
       }
     } catch (e) {
       console.log(e);
