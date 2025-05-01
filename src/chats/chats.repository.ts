@@ -8,10 +8,10 @@ const MessageData = require('./types');
 class ChatsRepository {
   static async getChats(user: any) {
     try {
+      let chats;
       if (user.isAdmin) {
-        const chats = await Chat().findAll();
-        console.log('if', user);
-        return chats;
+        chats = await Chat().findAll();
+        // return chats;
       } else {
         const userChats = await UserChat().findAll({
           where: { userID: user.id },
@@ -19,7 +19,7 @@ class ChatsRepository {
 
         const chatIds = userChats.map((uc: any) => uc.chatID);
 
-        const chats = await Chat().findAll({
+        chats = await Chat().findAll({
           where: {
             id: chatIds,
           },
@@ -62,52 +62,49 @@ class ChatsRepository {
         //   // if (latestMessageToSend)
         //   //   console.log('latestMessage', latestMessageToSend);
         // });
-
-        const chatsWithLatestMessages = await Promise.all(
-          chats.map(async (chat: any) => {
-            const messages = await Message().findAll({
-              where: { chatID: chat.id },
-            });
-
-            const latestMessage =
-              messages.length > 0
-                ? messages.reduce(
-                    (latest: any, current: any) =>
-                      new Date(current.sendingTime) >
-                      new Date(latest.sendingTime)
-                        ? current
-                        : latest,
-                    messages[0]
-                  )
-                : null;
-
-            if (!latestMessage) {
-              return { ...chat.toJSON(), latestMessage: null };
-            }
-
-            const sender = await User().findOne({
-              where: { id: latestMessage.senderID },
-            });
-
-            const latestMessageToSend = {
-              id: latestMessage.id,
-              text: latestMessage.text,
-              image: latestMessage.image,
-              sendingTime: latestMessage.sendingTime,
-              sender: {
-                firstname: sender?.firstname,
-                lastname: sender?.lastname,
-              },
-            };
-
-            return { ...chat.toJSON(), latestMessage: latestMessageToSend };
-          })
-        );
-
-        console.log('returned chats', chatsWithLatestMessages);
-
-        return chatsWithLatestMessages;
       }
+
+      const chatsWithLatestMessages = await Promise.all(
+        chats.map(async (chat: any) => {
+          const messages = await Message().findAll({
+            where: { chatID: chat.id },
+          });
+
+          const latestMessage =
+            messages.length > 0
+              ? messages.reduce(
+                  (latest: any, current: any) =>
+                    new Date(current.sendingTime) > new Date(latest.sendingTime)
+                      ? current
+                      : latest,
+                  messages[0]
+                )
+              : null;
+
+          if (!latestMessage) {
+            return { ...chat.toJSON(), latestMessage: null };
+          }
+
+          const sender = await User().findOne({
+            where: { id: latestMessage.senderID },
+          });
+
+          const latestMessageToSend = {
+            id: latestMessage.id,
+            text: latestMessage.text,
+            image: latestMessage.image,
+            sendingTime: latestMessage.sendingTime,
+            sender: {
+              firstname: sender?.firstname,
+              lastname: sender?.lastname,
+            },
+          };
+
+          return { ...chat.toJSON(), latestMessage: latestMessageToSend };
+        })
+      );
+
+      return chatsWithLatestMessages;
     } catch (e) {
       console.log(e);
       throw e;
