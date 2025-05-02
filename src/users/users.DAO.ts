@@ -135,73 +135,20 @@ class UsersDAO {
     }
   }
 
-  // static async updateUser(
-  //   id: string,
-  //   firstname?: string,
-  //   lastname?: string,
-  //   department?: string,
-  //   position?: string,
-  //   whatsapp?: string,
-  //   phoneNumber?: string,
-  //   birthDate?: string,
-  //   isAdmin?: boolean,
-  //   sessionID?: string,
-  //   image?: any
-  // ) {
-  //   try {
-  //     if (!sessionID) {
-  //       throw new CustomError('Session ID is required', 400);
-  //     }
-
-  //     const currentUser = await this.getCurrentUser(sessionID);
-  //     await this._isUserExist(Number(id));
-
-  //     // Подготавливаем базовые данные для обновления
-  //     const updateFields: Record<string, any> = {
-  //       firstname,
-  //       lastname,
-  //       whatsapp,
-  //       phoneNumber,
-  //       birthDate,
-  //       image,
-  //     };
-
-  //     // Добавляем поля, доступные только админу
-  //     if (currentUser.isAdmin) {
-  //       updateFields.department = department;
-  //       updateFields.position = position;
-  //       updateFields.isAdmin = isAdmin;
-  //     }
-
-  //     // Фильтруем undefined значения
-  //     const filteredUpdateFields = Object.fromEntries(
-  //       Object.entries(updateFields).filter(([_, value]) => value !== undefined)
-  //     );
-
-  //     // Проверяем права на обновление
-  //     if (!currentUser.isAdmin && String(currentUser.id) !== id) {
-  //       throw new CustomError(
-  //         `You don't have permission to update user data`,
-  //         403
-  //       );
-  //     }
-
-  //     // Проверяем, есть ли что обновлять
-  //     if (Object.keys(filteredUpdateFields).length === 0) {
-  //       throw new CustomError('No fields to update', 400);
-  //     }
-
-  //     await UsersRepository.updateUser(Number(id), filteredUpdateFields);
-  //   } catch (e) {
-  //     throw e; // Пробрасываем ошибку выше
-  //   }
-  // }
-
   static async deleteUser(id: number, sessionID: string) {
     try {
       await this._isCurrentUserAdmin(sessionID);
       await this._isUserExist(id);
       await UsersRepository.deleteUser(id);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async getAdmins() {
+    try {
+      const query = await UsersRepository.getAdmins();
+      return query;
     } catch (e) {
       throw e;
     }

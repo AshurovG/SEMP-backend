@@ -121,6 +121,18 @@ class UsersRepository {
       throw e;
     }
   }
+
+  static async getAdmins() {
+    try {
+      const admins = await User().findAll({
+        where: { isAdmin: true },
+      });
+
+      return admins;
+    } catch (e) {
+      throw e;
+    }
+  }
 }
 
 module.exports = {
