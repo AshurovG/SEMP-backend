@@ -74,43 +74,42 @@ class UsersRepository {
 
   static async updateUser(
     id: number,
-    firstname: string,
-    lastname: string,
-    department: string,
-    position: string,
-    whatsapp: string,
-    phoneNumber: string,
-    birthDate: string,
-    isAdmin: boolean,
-    image: any
+    firstname?: string,
+    lastname?: string,
+    department?: string,
+    position?: string,
+    whatsapp?: string,
+    phoneNumber?: string,
+    birthDate?: string,
+    isAdmin?: boolean,
+    image?: any
   ) {
     try {
+      const updateData: any = {};
+
+      // Добавляем поля только если они переданы (не undefined)
+      if (firstname !== undefined) updateData.firstname = firstname;
+      if (lastname !== undefined) updateData.lastname = lastname;
+      if (department !== undefined) updateData.department = department;
+      if (position !== undefined) updateData.position = position;
+      if (whatsapp !== undefined) updateData.whatsapp = whatsapp;
+      if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+      if (birthDate !== undefined) updateData.birthDate = birthDate;
+      if (isAdmin !== undefined) updateData.isAdmin = isAdmin;
+
       if (image) {
         await minioClient.putObject(
           'semp',
           `users/${image.originalname}`,
           image.buffer
         );
+        updateData.avatar = `http://localhost:9000/semp/users/${image.originalname}`;
       }
 
       console.log('image', image);
-      await User().update(
-        {
-          firstname,
-          lastname,
-          department,
-          position,
-          whatsapp,
-          phoneNumber,
-          birthDate,
-          isAdmin,
-          ...(image && {
-            avatar: `http://localhost:9000/semp/users/${image.originalname}`,
-          }),
-        },
-        { where: { id } }
-      );
+      await User().update(updateData, { where: { id } });
     } catch (e) {
+      console.log(e);
       throw e;
     }
   }
