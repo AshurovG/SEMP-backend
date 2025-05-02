@@ -121,7 +121,12 @@ class ChatsRepository {
     }
   }
 
-  static async postChat(title: string, description: string, image: any) {
+  static async postChat(
+    title: string,
+    description: string,
+    image: any,
+    createdAt: string
+  ) {
     try {
       if (image) {
         await minioClient.putObject(
@@ -137,6 +142,7 @@ class ChatsRepository {
         ...(image && {
           image: `http://localhost:9000/semp/posts/${image.originalname}`,
         }),
+        createdAt,
       });
 
       await newChat.save();

@@ -19,6 +19,9 @@ module.exports = () => {
     image: {
       type: DataTypes.STRING,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+    },
   });
 
   return Chat;

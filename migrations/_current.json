@@ -22,6 +22,10 @@
                 "image": {
                     "field": "image",
                     "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
                 }
             },
             "indexes": []
@@ -287,5 +291,5 @@
     "path": "/Users/g.ashurov/Desktop/pr/SEMP/SEMP-backend/migrations/_current.json",
     "backupPath": "/Users/g.ashurov/Desktop/pr/SEMP/SEMP-backend/migrations/_current_bak.json",
     "exists": true,
-    "revision": 3
+    "revision": 4
 }

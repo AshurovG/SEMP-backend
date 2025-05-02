@@ -56,7 +56,8 @@ class ChatsDAO {
       // if (isChatExist) {
       //   throw new CustomError(`chat with name="${title}" already exists`, 400);
       // }
-      await ChatsRepository.postChat(title, description, image);
+      const createdAt = new Date().toISOString();
+      await ChatsRepository.postChat(title, description, image, createdAt);
     } catch (e) {
       throw e;
     }
