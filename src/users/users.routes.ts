@@ -10,7 +10,6 @@ router.get('/users/:id', usersController.getUser);
 router.post('/users', usersController.postUser);
 router.put('/users/:id', upload.single('image'), usersController.updateUser);
 router.delete('/users/:id', usersController.deleteUser);
-router.get('/users_admins', usersController.getAdmins);
 
 module.exports = router;
 export {};

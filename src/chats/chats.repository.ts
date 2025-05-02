@@ -3,7 +3,7 @@ const Chat = require('../../models/chat');
 const User = require('../../models/user');
 const UserChat = require('../../models/userChat');
 const Message = require('../../models/message');
-const MessageData = require('./types');
+const { UsersRepository } = require('../users/users.repository');
 
 class ChatsRepository {
   static async getChats(user: any) {
@@ -11,7 +11,6 @@ class ChatsRepository {
       let chats;
       if (user.isAdmin) {
         chats = await Chat().findAll();
-        // return chats;
       } else {
         const userChats = await UserChat().findAll({
           where: { userID: user.id },
@@ -24,44 +23,6 @@ class ChatsRepository {
             id: chatIds,
           },
         });
-
-        // chats.map(async (chat: any) => {
-        //   const messages = await Message().findAll({
-        //     where: { chatID: chat.id },
-        //   });
-
-        //   const latestMessage =
-        //     messages.length > 0
-        //       ? messages.reduce(
-        //           (latest: any, current: any) =>
-        //             new Date(current.sendingTime) > new Date(latest.sendingTime)
-        //               ? current
-        //               : latest,
-        //           messages[0] // начальное значение (первый элемент)
-        //         )
-        //       : null; // если массив пуст
-
-        //   const sender = await User().findOne({
-        //     where: { id: latestMessage.senderID },
-        //   });
-
-        //   const latestMessageToSend = {
-        //     id: latestMessage.id,
-        //     text: latestMessage.text,
-        //     image: latestMessage.image,
-        //     sendingTime: latestMessage.sendingTime,
-        //     sender: {
-        //       firstname: sender.firstname,
-        //       lastname: sender.lastname,
-        //     },
-        //   };
-
-        //   console.log({ ...chat.toJSON(), latestMessage: latestMessageToSend });
-        //   return { ...chat.toJSON(), latestMessage: latestMessageToSend };
-
-        //   // if (latestMessageToSend)
-        //   //   console.log('latestMessage', latestMessageToSend);
-        // });
       }
 
       const chatsWithLatestMessages = await Promise.all(
@@ -135,7 +96,9 @@ class ChatsRepository {
         where: { chatID: id },
       });
 
-      const users = userChats.map((userChat: any) => usersMap[userChat.userID]);
+      let users = userChats.map((userChat: any) => usersMap[userChat.userID]);
+      const admins = await UsersRepository.getAdmins();
+      users = [...admins, ...users];
 
       const chat = await Chat().findByPk(id);
 
@@ -226,23 +189,6 @@ class ChatsRepository {
     }
   }
 
-  // static async updateChat(
-  //   id: number,
-  //   title: string,
-  //   description: string,
-  //   image: any
-  // ) {
-  //   try {
-  //     const chatToUpdate = await Chat().findByPk(id);
-  //     chatToUpdate.title = title;
-  //     chatToUpdate.description = description;
-
-  //     await chatToUpdate.save();
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // }
-
   static async deleteChat(id: number) {
     try {
       await Chat().destroy({ where: { id } });
@@ -264,7 +210,7 @@ class ChatsRepository {
       );
 
       const usersNotInChat = allUsers.filter(
-        (user: any) => !userChatIds.has(user.id)
+        (user: any) => !userChatIds.has(user.id) && !user.isAdmin
       );
 
       return usersNotInChat;

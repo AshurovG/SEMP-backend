@@ -144,15 +144,6 @@ class UsersDAO {
       throw e;
     }
   }
-
-  static async getAdmins() {
-    try {
-      const query = await UsersRepository.getAdmins();
-      return query;
-    } catch (e) {
-      throw e;
-    }
-  }
 }
 
 module.exports = {

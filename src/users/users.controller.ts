@@ -100,16 +100,6 @@ class UsersCotroller {
       ErrorHandler.handle(res, e);
     }
   }
-
-  async getAdmins(req: Request, res: Response): Promise<void> {
-    console.log('getAdmins controller');
-    try {
-      const data = await UsersDAO.getAdmins();
-      res.json(data);
-    } catch (e) {
-      ErrorHandler.handle(res, e);
-    }
-  }
 }
 
 module.exports = new UsersCotroller();
