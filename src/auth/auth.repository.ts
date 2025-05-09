@@ -12,6 +12,11 @@ class AuthRepository {
     return user.lastCode;
   }
 
+  static async resetLastCode(telegram: string) {
+    const user = await User().findOne({ where: { telegram } });
+    await User().update({ lastCode: '' }, { where: { id: user.id } });
+  }
+
   static async checkUser(telegram: string) {
     const existingUser = await User().findOne({ where: { telegram } });
 

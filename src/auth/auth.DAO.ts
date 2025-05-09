@@ -41,6 +41,8 @@ class AuthDAO {
       const lastCode = await AuthRepository.auth(telegram, randomSessionID);
       if (lastCode !== code) {
         throw new CustomError('invalid access code', 401);
+      } else {
+        AuthRepository.resetLastCode(telegram);
       }
       return randomSessionID;
     } catch (error) {
