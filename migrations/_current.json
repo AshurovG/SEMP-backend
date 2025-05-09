@@ -233,6 +233,10 @@
                     "field": "isAdmin",
                     "seqType": "Sequelize.BOOLEAN"
                 },
+                "status": {
+                    "field": "status",
+                    "seqType": "Sequelize.STRING"
+                },
                 "lastCode": {
                     "field": "lastCode",
                     "seqType": "Sequelize.STRING"
@@ -291,5 +295,5 @@
     "path": "/Users/g.ashurov/Desktop/pr/SEMP/SEMP-backend/migrations/_current.json",
     "backupPath": "/Users/g.ashurov/Desktop/pr/SEMP/SEMP-backend/migrations/_current_bak.json",
     "exists": true,
-    "revision": 4
+    "revision": 5
 }

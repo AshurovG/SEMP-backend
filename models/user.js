@@ -19,6 +19,7 @@ module.exports = () => {
     phoneNumber: DataTypes.STRING,
     birthDate: DataTypes.DATEONLY,
     isAdmin: DataTypes.BOOLEAN,
+    status: DataTypes.STRING,
     lastCode: DataTypes.STRING,
   });
 

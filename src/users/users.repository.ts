@@ -73,41 +73,46 @@ class UsersRepository {
   }
 
   static async updateUser(
-    id: number,
-    firstname?: string,
-    lastname?: string,
-    department?: string,
-    position?: string,
-    whatsapp?: string,
-    phoneNumber?: string,
-    birthDate?: string,
-    isAdmin?: boolean,
-    image?: any
+    // id: number,
+    // firstname?: string,
+    // lastname?: string,
+    // department?: string,
+    // position?: string,
+    // whatsapp?: string,
+    // phoneNumber?: string,
+    // birthDate?: string,
+    // isAdmin?: boolean,
+    // status?: string,
+    // image?: any
+    user: any
   ) {
     try {
       const updateData: any = {};
 
       // Добавляем поля только если они переданы (не undefined)
-      if (firstname !== undefined) updateData.firstname = firstname;
-      if (lastname !== undefined) updateData.lastname = lastname;
-      if (department !== undefined) updateData.department = department;
-      if (position !== undefined) updateData.position = position;
-      if (whatsapp !== undefined) updateData.whatsapp = whatsapp;
-      if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
-      if (birthDate !== undefined) updateData.birthDate = birthDate;
-      if (isAdmin !== undefined) updateData.isAdmin = isAdmin;
+      if (user.firstname !== undefined) updateData.firstname = user.firstname;
+      if (user.lastname !== undefined) updateData.lastname = user.lastname;
+      if (user.department !== undefined)
+        updateData.department = user.department;
+      if (user.position !== undefined) updateData.position = user.position;
+      if (user.whatsapp !== undefined) updateData.whatsapp = user.whatsapp;
+      if (user.phoneNumber !== undefined)
+        updateData.phoneNumber = user.phoneNumber;
+      if (user.birthDate !== undefined) updateData.birthDate = user.birthDate;
+      if (user.status !== undefined) updateData.status = user.status;
+      if (user.isAdmin !== undefined) updateData.isAdmin = user.isAdmin;
 
-      if (image) {
+      if (user.image) {
         await minioClient.putObject(
           'semp',
-          `users/${image.originalname}`,
-          image.buffer
+          `users/${user.image.originalname}`,
+          user.image.buffer
         );
-        updateData.avatar = `http://localhost:9000/semp/users/${image.originalname}`;
+        updateData.avatar = `http://localhost:9000/semp/users/${user.image.originalname}`;
       }
 
-      console.log('image', image);
-      await User().update(updateData, { where: { id } });
+      console.log('image', user.image);
+      await User().update(updateData, { where: { id: user.id } });
     } catch (e) {
       console.log(e);
       throw e;

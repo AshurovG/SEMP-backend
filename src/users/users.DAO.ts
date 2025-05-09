@@ -96,14 +96,15 @@ class UsersDAO {
     birthDate: string,
     isAdmin: boolean,
     sessionID: string,
+    status: string,
     image: any
   ) {
     try {
       const currentUser = await this.getCurrentUser(sessionID);
       await this._isUserExist(Number(id));
       if (currentUser.isAdmin) {
-        await UsersRepository.updateUser(
-          Number(id),
+        await UsersRepository.updateUser({
+          id: Number(id),
           firstname,
           lastname,
           department,
@@ -112,18 +113,20 @@ class UsersDAO {
           phoneNumber,
           birthDate,
           isAdmin,
-          image
-        );
+          status,
+          image,
+        });
       } else if (String(currentUser.id) === id && !currentUser.isAdmin) {
-        await UsersRepository.updateUser(
+        await UsersRepository.updateUser({
           id,
           firstname,
           lastname,
           whatsapp,
           phoneNumber,
           birthDate,
-          image
-        );
+          status,
+          image,
+        });
       } else {
         throw new CustomError(
           `you don't have permission to update user data`,

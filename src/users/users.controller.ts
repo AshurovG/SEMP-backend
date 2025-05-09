@@ -63,6 +63,7 @@ class UsersCotroller {
       phoneNumber,
       birthDate,
       isAdmin,
+      status,
     } = req.body;
     const image = req.file;
     console.log('req file', image);
@@ -81,6 +82,7 @@ class UsersCotroller {
         birthDate,
         isAdmin,
         sessionID,
+        status,
         image
       );
       res.sendStatus(200);
