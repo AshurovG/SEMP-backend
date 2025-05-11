@@ -1,5 +1,6 @@
 const Post = require('../../models/post');
 const Comment = require('../../models/comment');
+const Like = require('../../models/like');
 const User = require('../../models/user');
 const PostData = require('./types');
 const CommentData = require('./types');
@@ -28,7 +29,29 @@ class PostsRepository {
             })
           );
 
-          return { ...post.toJSON(), comments: commentsWithUsers };
+          const likes = await Like().findAll({
+            where: { postID: post.id },
+          });
+
+          const LikesWithUsers = await Promise.all(
+            likes.map(async (like: any) => {
+              const user = await User().findByPk(like.userID);
+              return {
+                ...like.toJSON(),
+                user: {
+                  firstname: user.firstname,
+                  lastname: user.lastname,
+                  avatar: user.avatar,
+                },
+              };
+            })
+          );
+
+          return {
+            ...post.toJSON(),
+            comments: commentsWithUsers,
+            likes: LikesWithUsers,
+          };
         })
       );
 
